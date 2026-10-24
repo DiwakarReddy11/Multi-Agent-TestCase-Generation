@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     llm_timeout_s: int = 60
     cache_path: str = ".cache/llm_cache.sqlite"
 
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+    models_cache_dir: str = ".cache/models"
+    chroma_path: str = "data/chroma"
+
 
 @lru_cache
 def get_settings() -> Settings:

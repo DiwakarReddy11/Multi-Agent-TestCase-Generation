@@ -33,3 +33,8 @@ class Chunk(BaseModel):
         # The heading gives short chunks context: "Loans are limited to 5" alone
         # says nothing about borrowing, but "2.3 Borrowing and Returns" does.
         return f"{self.section}\n{self.text}" if self.section else self.text
+
+
+class RetrievedChunk(BaseModel):
+    chunk: Chunk
+    score: float = Field(description="Cosine similarity to the query; higher is more relevant")
