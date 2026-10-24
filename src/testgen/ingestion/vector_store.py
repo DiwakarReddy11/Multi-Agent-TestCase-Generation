@@ -1,12 +1,14 @@
 """Persistent store of SRS chunks and their embeddings, backed by a local Chroma database."""
 
+from functools import lru_cache
 from pathlib import Path
 
 import chromadb
 from chromadb.api.types import Metadata
 from chromadb.config import Settings as ChromaSettings
 
-from testgen.ingestion.embeddings import Embedder
+from testgen.config import get_settings
+from testgen.ingestion.embeddings import Embedder, get_embedder
 from testgen.schemas import Chunk, RetrievedChunk
 
 DEFAULT_COLLECTION = "srs_chunks"
@@ -73,3 +75,9 @@ class ChunkStore:
             RetrievedChunk(chunk=_to_chunk(i, t, m), score=1 - d)
             for i, t, m, d in zip(ids, texts, metas, distances, strict=True)
         ]
+
+
+@lru_cache
+def get_chunk_store() -> ChunkStore:
+    """The app's store: the local embedding model plus the Chroma folder from settings."""
+    return ChunkStore(get_embedder(), Path(get_settings().chroma_path))

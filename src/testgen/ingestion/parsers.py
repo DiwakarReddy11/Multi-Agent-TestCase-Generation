@@ -100,7 +100,7 @@ def _to_blocks(lines: Iterable[Line]) -> list[TextBlock]:
 
 def parse_document(path: Path) -> ParsedDocument:
     if not path.is_file():
-        raise FileNotFoundError(path)
+        raise FileNotFoundError(f"File not found: {path}")
     size_mb = path.stat().st_size / 1_000_000
     if size_mb > MAX_FILE_MB:
         raise UnsupportedDocumentError(

@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from testgen!")
+"""Multi-agent test case generation from SRS documents."""
