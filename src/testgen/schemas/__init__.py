@@ -1,6 +1,6 @@
 """Data contracts shared by every agent."""
 
-from testgen.schemas.document import ParsedDocument, TextBlock
+from testgen.schemas.document import Chunk, ParsedDocument, TextBlock
 from testgen.schemas.requirement import (
     Priority,
     Requirement,
@@ -11,6 +11,7 @@ from testgen.schemas.requirement import (
 from testgen.schemas.test_case import TestCase, TestStep, TestType
 
 __all__ = [
+    "Chunk",
     "ParsedDocument",
     "Priority",
     "Requirement",
