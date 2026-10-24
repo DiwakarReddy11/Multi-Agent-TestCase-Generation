@@ -1,0 +1,282 @@
+# Golden labels for the City Library Management System SRS.
+# Labelling rules: evals/datasets/README.md
+
+name: library_system
+srs_file: library_system_srs.md
+
+requirements:
+  # ---- 2.1 Account Management ----
+  - id: REQ-001
+    original_id: FR-1
+    title: Member registration
+    description: The system shall allow a visitor to register as a member with name, email and password.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.1 Account Management}
+    obligations:
+      - type: positive
+        description: A visitor who enters a valid name, email and password becomes a member
+      - type: negative
+        description: Registration is rejected when name, email or password is missing
+
+  - id: REQ-002
+    original_id: FR-2
+    title: Password strength
+    description: The password shall be at least 8 characters long and contain at least one digit.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.1 Account Management}
+    obligations:
+      - type: boundary
+        description: A password of exactly 8 characters with a digit is accepted
+      - type: boundary
+        description: A password of 7 characters is rejected
+      - type: negative
+        description: A password of 8 or more characters without any digit is rejected
+
+  - id: REQ-003
+    original_id: FR-3
+    title: Account lockout
+    description: The system shall lock a member account for 15 minutes after 5 consecutive failed login attempts.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.1 Account Management}
+    obligations:
+      - type: boundary
+        description: Four consecutive failed logins do not lock the account
+      - type: boundary
+        description: The fifth consecutive failed login locks the account
+      - type: positive
+        description: The member can log in again once the 15-minute lock has passed
+      - type: edge
+        description: A successful login between failures resets the consecutive-failure count
+
+  - id: REQ-004
+    original_id: FR-4
+    title: Password reset link
+    description: The system shall let a member reset their password through a link sent to their registered email.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.1 Account Management}
+    obligations:
+      - type: positive
+        description: Requesting a reset sends a link to the registered email that lets the member set a new password
+      - type: negative
+        description: A reset request for an unregistered email does not send a reset link
+
+  - id: REQ-005
+    original_id: FR-4
+    title: Reset link expiry
+    description: A password reset link shall expire 30 minutes after it is sent.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.1 Account Management}
+    obligations:
+      - type: boundary
+        description: A reset link used just before 30 minutes still works
+      - type: boundary
+        description: A reset link used after 30 minutes is rejected as expired
+
+  # ---- 2.2 Catalogue Search ----
+  - id: REQ-006
+    original_id: FR-5
+    title: Catalogue search
+    description: The system shall let any user search books by title, author or ISBN.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.2 Catalogue Search}
+    obligations:
+      - type: positive
+        description: Searching by title, by author and by ISBN each return the matching book
+      - type: negative
+        description: A search with no matching book returns an empty result without an error
+
+  - id: REQ-007
+    original_id: FR-6
+    title: Copy availability in results
+    description: Search results shall show the availability of each copy as available, on loan or reserved.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.2 Catalogue Search}
+    obligations:
+      - type: positive
+        description: Each of the three statuses available, on loan and reserved is shown correctly for a copy
+
+  # ---- 2.3 Borrowing and Returns ----
+  - id: REQ-008
+    original_id: FR-7
+    title: Loan limit
+    description: A member shall be able to borrow at most 5 books at the same time.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.3 Borrowing and Returns}
+    obligations:
+      - type: boundary
+        description: A member holding 4 books can borrow a 5th
+      - type: boundary
+        description: A member holding 5 books cannot borrow a 6th
+
+  - id: REQ-009
+    original_id: FR-8
+    title: Loan period
+    description: The standard loan period shall be 14 days.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.3 Borrowing and Returns}
+    obligations:
+      - type: positive
+        description: A new loan gets a due date 14 days after the borrowing date
+
+  - id: REQ-010
+    original_id: FR-9
+    title: Loan renewal
+    description: A member shall be able to renew a loan once for 7 more days, unless another member has reserved the book.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.3 Borrowing and Returns}
+    obligations:
+      - type: positive
+        description: A first renewal extends the due date by 7 days
+      - type: negative
+        description: A second renewal of the same loan is rejected
+      - type: negative
+        description: Renewal is rejected when another member has reserved the book
+
+  - id: REQ-011
+    original_id: FR-10
+    title: Overdue fines
+    description: The system shall charge a fine of 10 INR per day for each overdue book, up to a maximum of 500 INR per book.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.3 Borrowing and Returns}
+    obligations:
+      - type: positive
+        description: A book 3 days overdue is charged a fine of 30 INR
+      - type: boundary
+        description: A book 50 days overdue is charged exactly 500 INR
+      - type: boundary
+        description: A book more than 50 days overdue is still charged 500 INR, not more
+      - type: edge
+        description: A book returned on its due date is charged no fine
+
+  - id: REQ-012
+    original_id: FR-11
+    title: Borrowing blocked by unpaid fines
+    description: A member with unpaid fines above 200 INR shall not be able to borrow books.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.3 Borrowing and Returns}
+    obligations:
+      - type: boundary
+        description: A member with exactly 200 INR of unpaid fines can still borrow
+      - type: boundary
+        description: A member with 201 INR of unpaid fines cannot borrow
+
+  # ---- 2.4 Reservations ----
+  - id: REQ-013
+    original_id: FR-12
+    title: Reserve a book on loan
+    description: A member shall be able to reserve a book that is currently on loan.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.4 Reservations}
+    obligations:
+      - type: positive
+        description: A member can reserve a book that is on loan
+      - type: negative
+        description: A book that is on the shelf and available cannot be reserved
+
+  - id: REQ-014
+    original_id: FR-13
+    title: Reservation notification
+    description: When a reserved book is returned, the system shall email the first member in the reservation queue.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.4 Reservations}
+    obligations:
+      - type: positive
+        description: Returning a reserved book sends an email to the first member in the queue
+      - type: edge
+        description: With two members in the queue only the first one is emailed
+
+  - id: REQ-015
+    original_id: FR-13
+    title: Reservation hold period
+    description: A returned reserved book shall be held for the first member in the queue for 3 days.
+    type: functional
+    source: {document: library_system_srs.md, section: 2.4 Reservations}
+    obligations:
+      - type: positive
+        description: During the 3-day hold the book cannot be borrowed by any other member
+      - type: boundary
+        description: After 3 days the hold ends and the book is released
+
+  # ---- 3 Non-Functional Requirements ----
+  - id: REQ-016
+    original_id: NFR-1
+    title: Search response time
+    description: Catalogue search shall return results within 2 seconds for 95% of requests with up to 500 concurrent users.
+    type: non_functional
+    source: {document: library_system_srs.md, section: 3.1 Performance}
+    obligations:
+      - type: positive
+        description: Under a load of 500 concurrent users the 95th-percentile search time is at most 2 seconds
+
+  - id: REQ-017
+    original_id: NFR-2
+    title: Hashed password storage
+    description: Passwords shall be stored hashed with bcrypt and never in plain text.
+    type: non_functional
+    source: {document: library_system_srs.md, section: 3.2 Security}
+    obligations:
+      - type: positive
+        description: The stored password value is a bcrypt hash, not the plain-text password
+
+  - id: REQ-018
+    original_id: NFR-2
+    title: No passwords in logs
+    description: Plain-text passwords shall never be written to logs.
+    type: non_functional
+    source: {document: library_system_srs.md, section: 3.2 Security}
+    obligations:
+      - type: negative
+        description: After registration and login the application logs contain no plain-text password
+
+  - id: REQ-019
+    original_id: NFR-3
+    title: HTTPS only
+    description: All pages shall be served over HTTPS.
+    type: non_functional
+    source: {document: library_system_srs.md, section: 3.2 Security}
+    obligations:
+      - type: positive
+        description: Every page is served over HTTPS
+      - type: negative
+        description: A plain HTTP request is redirected to HTTPS or refused
+
+  - id: REQ-020
+    original_id: NFR-4
+    title: Monthly availability
+    description: The system shall be available 99.5% of the time each month, excluding planned maintenance announced 48 hours in advance.
+    type: non_functional
+    source: {document: library_system_srs.md, section: 3.3 Availability}
+    obligations:
+      - type: positive
+        description: Monthly uptime, excluding announced maintenance, is at least 99.5%
+      - type: edge
+        description: Maintenance announced less than 48 hours ahead counts as downtime
+
+retrieval:
+  - question: What happens after too many wrong passwords?
+    relevant_sections: [2.1 Account Management]
+  - question: How do I reset my password?
+    relevant_sections: [2.1 Account Management]
+  - question: How many books can a member borrow at once?
+    relevant_sections: [2.3 Borrowing and Returns]
+  - question: What is the fine for returning a book late?
+    relevant_sections: [2.3 Borrowing and Returns]
+  - question: Can I extend my loan?
+    relevant_sections: [2.3 Borrowing and Returns]
+  - question: What happens when a book I reserved comes back?
+    relevant_sections: [2.4 Reservations]
+  - question: Can I search by ISBN?
+    relevant_sections: [2.2 Catalogue Search]
+  - question: How fast must search be?
+    relevant_sections: [3.1 Performance]
+  - question: How are passwords protected?
+    relevant_sections: [3.2 Security]
+  - question: What uptime is guaranteed?
+    relevant_sections: [3.3 Availability]
+  - question: Who are the users of the system?
+    relevant_sections: [1.2 Users]
+  # Not answered by the SRS: retrieval should return nothing.
+  - question: Can members pay fines with cryptocurrency?
+    relevant_sections: []
+  - question: Which mobile platforms are supported?
+    relevant_sections: []
